@@ -30,3 +30,6 @@
 
 # Misc. Documentation
 *.pdf
+
+# .vimrc
+.vimrc
