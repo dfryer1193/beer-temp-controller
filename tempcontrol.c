@@ -15,6 +15,12 @@
 #include<util/delay.h>
 
 int main(void){
-  //Setup clock
+  //Set clock to 16 MHz
+  //Other setup
+  //Main loop
+    //Get temp
+    //If out of range, turn on heat lamp
+    //If in range, turn output off
+    //Sleep for 60 s
   return 0;
 }
