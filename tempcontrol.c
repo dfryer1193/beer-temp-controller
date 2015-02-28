@@ -15,8 +15,15 @@
 #include<util/delay.h>
 
 int main(void){
-  //Set clock to 16 MHz
   //Other setup
+  // 0 for input, 1 for output
+  DDRB=0b00001000;
+  while(1) {
+    PORTB=0b00001000;
+    _delay_ms(20);
+    PORTB=0b00000000;
+    _delay_ms(20);
+  }
   //Main loop
     //Get temp
     //If out of range, turn on heat lamp
