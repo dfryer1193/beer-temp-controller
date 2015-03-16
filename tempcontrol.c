@@ -24,6 +24,10 @@ int main(void){
     PORTB=0b00000000;
     _delay_ms(20);
   }
+  while(1) { //main loop
+    temperature=getTemp();
+
+  }
   //Main loop
     //Get temp
     //If out of range, turn on heat lamp
