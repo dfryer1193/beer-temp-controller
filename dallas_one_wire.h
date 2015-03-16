@@ -63,7 +63,7 @@ uint8_t reset(void);
 void drive_bus(void);
 
 // Sends a MATCH_ROM_COMMAND to spec'd device, auto reset.
-void match_rom(DALLAS_IDENTIFIER_t *);
+void match_rom(IDENTIFIER_t *);
 
 // Sends a SKIP_ROM_COMMAND. Automatically resets the bus.
 void skip_rom(void);
@@ -71,7 +71,7 @@ void skip_rom(void);
 // Populates identifier list. Returns:
 //  0 - if devices were found and there was no error
 //  1 - if there was a bus error
-//  2 - if there were more devices than spec'd by DALLAS_NUM_DEVICES
+//  2 - if there were more devices than spec'd by NUM_DEVICES
 uint8_t search_identifiers(void);
 
 #endif
