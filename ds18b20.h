@@ -2,11 +2,10 @@
 #ifndef ds18b20_h
 #define ds18b20_h
 
-//might not be needed
-//#include <inttypes.h>
-
 #define TRUE 1
 #define FALSE 0
+
+#define TEMP_RESOLUTION = 12
 
 //Function prototypes
 
