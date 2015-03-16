@@ -10,12 +10,12 @@
 IDENTIFIER_LIST_t identifier_list;
 
 /* Identifier routine return codes */
-#define DALLAS_IDENTIFIER_NO_ERROR      0x00
-#define DALLAS_IDENTIFIER_DONE          0x01
-#define DALLAS_IDENTIFIER_SEARCH_ERROR  0x02
+#define IDENTIFIER_NO_ERROR      0x00
+#define IDENTIFIER_DONE          0x01
+#define IDENTIFIER_SEARCH_ERROR  0x02
 
 /* Private function prototypes */
-static uint8_t discover_identifier(DALLAS_IDENTIFIER_t *, DALLAS_IDENTIFIER_t *);
+static uint8_t discover_identifier(IDENTIFIER_t *, IDENTIFIER_t *);
 
 /* functions */
 void write(uint8_t bit) {
@@ -106,7 +106,7 @@ uint8_t reset(void) {
 
     _delay_us(70);
 
-    if ((DALLAS_PORT_IN & (1 << PIN)) == 0x00) {
+    if ((PORT_IN & (1 << PIN)) == 0x00) {
       reply = 0x01;
     }
 
@@ -146,4 +146,127 @@ void drive_bus(void) {
   PORT |= (1 << PIN);
 }
 
-// TODO: finish according to http://www.dietfig.org/avronewire.html
+void match_rom(IDENTIFIER_t * identifier) {
+  uint8_t identifier_bit;
+  uint8_t current_byte;
+  uint8_t current_bit;
+  
+  reset();
+  write_byte(MATCH_ROM_COMMAND);
+
+  for (identifier_bit = 0x00; identifier_bit < NUM_IDENTIFIER_BITS; identifier_bit++) {
+    current_byte = identifier_bit / 8;
+    current_bit = identifier_bit - (current_byte * 8);
+
+    write(identifier->identifier[current_byte] & (1 << current_bit));
+  }
+}
+
+void skip_rom(void) {
+  reset();
+  write_byte(SKIP_ROM_COMMAND);
+}
+
+uint8_t search_identifiers(void) {
+  uint8_t current_device;
+  uint8_t return_code;
+
+  for (current_device = 0x00; current_device < NUM_DEVICES; current_device++) {
+    if (current_device == 0x00) {
+      return_code = discover_identifier(&identifier_list.identifiers[current_device], 0x00);
+    } else {
+      return_code = discover_identifier(&identifier_list.identifiers[current_device], \
+          &identifier_list.identifiers[current_device-1]);
+    }
+
+    if (return_code == IDENTIFIER_DONE) {
+      identifier_list.num_devices = current_device + 0x01;
+      return 0x00;
+    } else if (return_code == IDENTIFIER_SEARCH_ERROR) {
+      return 0x01;
+    }
+  }
+  return 0x02;
+}
+
+IDENTIFIER_LIST_t * get_identifier_list(void) {
+  return &identifier_list;
+}
+
+static uint8_t discover_identifier(IDENTIFIER_t * current_identifier, IDENTIFIER_t * last_identifier) {
+  uint8_t identifier_bit;
+  uint8_t recieved_two_bits;
+  uint8_t current_bit;
+  uint8_t current_byte;
+  uint8_t identifier_diverged;
+
+  identifier_diverged = 0x00;
+  identifier_bit = 0x00;
+
+  reset();
+  write_byte(SEARCH_ROM_COMMAND);
+
+  for (identifier_bit = 0; identifier_bit < NUM_IDENTIFIER_BITS; identifier_bit++) {
+    recieved_two_bits = (read() << 1);
+    recieved_two_bits += read();
+
+    current_byte = identifier_bit / 8;
+    current_bit = identifier_bit - (current_byte * 8);
+
+    if (recieved_two_bits == 0x02) {
+      // All devices have a 1 at this position.
+      current_identifier->identifier[current_byte] += (1 << current_bit);
+
+      write(0x01);
+    } else if (recieved_two_bits == 0x01) {
+      // All devices have a 0 at this position.
+
+      write(0x00);
+    } else if (recieved_two_bits == 0x00) {
+      if ((identifier_diverged == 0x00) && (last_identifier != 0x00)) {
+        identifier_diverged = 0x01;
+
+        if ((last_identifier->identifier[current_byte] & (1 << current_bit)) == 0x00) {
+          // Then we choose 1.
+
+          current_identifier->identifier[current_byte] += (1 << current_bit);
+
+          write(0x01);
+        } else {
+          // 0 otherwise.
+
+          write(0x00);
+        }
+      } else {
+        // We'll go with 0.
+        write(0x00);
+      }
+    } else {
+      // ERROR!
+      return IDENTIFIER_SEARCH_ERROR;
+    }
+  }
+
+  if (identifier_diverged == 0x00) {
+    return IDENTIFIER_DONE;
+  } else {
+    return IDENTIFIER_NO_ERROR;
+  }
+}
+
+void write_buffer(uint8_t * buffer, uint8_t buffer_length) {
+  uint8_t i;
+
+  for (i = 0x00; i < buffer_length; i++) {
+    write_byte(buffer[i]);
+  }
+}
+
+void read_buffer(uint8_t * buffer, uint8_t buffer_length) {
+  uint8_t i;
+
+  for (i = 0x00; i < buffer_length; i++) {
+    buffer[i] = read_byte();
+  }
+}
+
