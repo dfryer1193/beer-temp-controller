@@ -17,9 +17,7 @@
 #include "ds18b20.h"
 
 // Ales
-#define TEMP_RANGE_MAX  70.0
 #define TEMP_IDEAL      67.0
-#define TEMP_RANGE_MIN  64.0
 
 #define MINUTE_MS       60000
 
@@ -42,11 +40,13 @@ int main(void){
 
       if (cool_on) {
         // turn off cooling
+        // TODO: add code to turn on/off a port to toggle cooling
         cool_on = FALSE;
       }
 
       if (!heat_on) {
         // turn on lamp
+        // TODO: add code to turn on/off a port to toggle heating
         heat_on = TRUE;
       }
 
@@ -56,11 +56,13 @@ int main(void){
 
       if (heat_on) {
         // turn off heating
+        // TODO: add code to turn on/off a port to toggle heating
         heat_on = FALSE;
       }
 
       if (!cool_on) {
         // Turn on cooling
+        // TODO: add code to turn on/off a port to toggle cooling
         cool_on = TRUE;
       }
 
