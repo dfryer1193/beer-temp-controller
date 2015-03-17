@@ -2,46 +2,23 @@
 #ifndef ds18b20_h
 #define ds18b20_h
 
+#include "dallas_one_wire.h"
+
 #define TRUE 1
 #define FALSE 0
 
 #define TEMP_RESOLUTION = 12
 
-//Function prototypes
+#define CONVERT_T_COMMAND         0x44
+#define READ_SCRATCHPAD_COMMAND   0xBE
+#define WRITE_SCRATCHPAD_COMMAND  0x4E
 
-// Performs a reset cycle
-// Returns 1 if a device returns a presence pulse
-// Returns 0 if there is no device or the bus is shorted or low for >250us
-uint8_t reset(void);
+#define make16(msb, lsb) ((msb << 8) | lsb)
 
-void skip(void);
+// Reads the temperature from the thermometer.
+float getTemp(void);
 
-// Write a byte. If power is 1, hold the device high at the end for
-// parasitically powered devices
-void write(uint8_t v, uint8_t power = 0);
-
-void write_bytes(const uint8_t *buf, uint8_t count, bool power=0);
-
-// Read a byte
-uint8_t read(void);
-
-void read_bytes(uint8_t *buf, uint16_t count);
-
-// Write a bit
-void write_bit(uint8_t v);
-
-// Read a bit
-uint8_t read_bit(void);
-
-// Stop powering the bus
-void depower(void);
-
-//Sensor structure
-struct DS18B20 {
-  unsigned char ROM_NO[8];
-  uint8_t LastDiscrepancy;
-  uint8_t LastFamilyDiscrepancy;
-  uint8_t LastDeviceFlag;
-}
+// Writes configuration data to device.
+void ds18b20_configure(uint8_t tH, uint8_t tL, uint8_t conf);
 
 #endif
