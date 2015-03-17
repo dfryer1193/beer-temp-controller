@@ -14,24 +14,64 @@
 #include<avr/io.h>
 #include<util/delay.h>
 
-int main(void){
-  //Other setup
-  // 0 for input, 1 for output
-  DDRB=0b00001000;
-  while(1) {
-    PORTB=0b00001000;
-    _delay_ms(20);
-    PORTB=0b00000000;
-    _delay_ms(20);
-  }
-  while(1) { //main loop
-    temperature=getTemp();
+#include "ds18b20.h"
 
+// Ales
+#define TEMP_RANGE_MAX  70.0
+#define TEMP_IDEAL      67.0
+#define TEMP_RANGE_MIN  64.0
+
+#define MINUTE_MS       60000
+
+static float convert(float temperature);
+
+int main(void){
+  float temperature = 0.0;
+  bool  heat_on;
+  bool  cool_on;
+  
+  // Setup
+  reset();
+  
+  while(1) { //main loop
+    temperature = getTemp();
+    temperature = convert(temperature);
+    
+    // For ales, 62 < temp < 72
+    if (temperature < TEMP_IDEAL) {
+
+      if (cool_on) {
+        // turn off cooling
+        cool_on = FALSE;
+      }
+
+      if (!heat_on) {
+        // turn on lamp
+        heat_on = TRUE;
+      }
+
+      // Wait a minute to avoid rapid flickering
+      _delay_ms(MINUTE_MS);
+    } else if (temperature > TEMP_IDEAL) {
+
+      if (heat_on) {
+        // turn off heating
+        heat_on = FALSE;
+      }
+
+      if (!cool_on) {
+        // Turn on cooling
+        cool_on = TRUE;
+      }
+
+      // Wait a minute to avoid flickering
+      _delay_ms(MINUTE_MS);
+    }
   }
-  //Main loop
-    //Get temp
-    //If out of range, turn on heat lamp
-    //If in range, turn output off
-    //Sleep for 60 s
+  
   return 0;
+}
+
+static float convert(float temperature) {
+  return (temperature * (9.0/5.0) + 32.0);
 }
