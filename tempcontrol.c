@@ -25,8 +25,8 @@ static float convert(float temperature);
 
 int main(void){
   float temperature = 0.0;
-  bool  heat_on;
-  bool  cool_on;
+  uint8_t heat_on;
+  uint8_t cool_on;
   
   // Setup
   reset();
