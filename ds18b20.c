@@ -8,7 +8,7 @@ float getTemp(void) {
   uint8_t busy = 0;
   uint8_t temp1;
   uint8_t temp2;
-  signed int16_t temp3;
+  int16_t temp3;
   float result;
 
   // Address all devices
