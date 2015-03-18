@@ -21,11 +21,11 @@ CFLAGS	= -Wall			\
 
 LDFLAGS	= -L /usr/avr/lib
 
-clean:
-	rm -f $(OBJS) $(TARGET)
-
 all : clean $(TARGET)
 	echo "make all complete"
+
+clean :
+	rm -f $(OBJS) $(TARGET)
 
 $(TARGET) : $(OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SRCS)
