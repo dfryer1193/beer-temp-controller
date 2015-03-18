@@ -1,8 +1,4 @@
-#include <avr/io.h>
-#include <stdint.h>
-
 #include <util/atomic.h>
-#include <util/delay.h>
 
 #include "dallas_one_wire.h"
 

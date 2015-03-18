@@ -2,11 +2,13 @@
 
 #ifndef DALLAS_ONE_WIRE_H
 #define DALLAS_ONE_WIRE_H
+/* includes */
+#include <avr/io.h>
+#include <stdint.h>
+
+#include <util/delay.h>
 
 /* defines */
-
-// clock freq
-#define F_CPU 8000000UL //1MHz
 
 // pins
 #define PORT     PORTB
@@ -52,7 +54,7 @@ uint8_t read(void);
 uint8_t read_byte(void);
 
 // Reads bytes into specified buffer
-read_buffer(uint8_t * buffer, uint8_t buffer_len);
+void read_buffer(uint8_t * buffer, uint8_t buffer_len);
 
 // Resets the bus. Returns:
 //  TRUE - if a device indicates presence
